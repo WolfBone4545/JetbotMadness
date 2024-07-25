@@ -33,7 +33,7 @@ max_i = 5
 
 def compute_matrix():
     ret, matrix, distortion, r_vecs, t_vecs = cv2.calibrateCamera(
-        threedpoints, twodpoints, img_shape.shape[::-1], None, None)
+        threedpoints, twodpoints, img_shape[::-1], None, None)
 
     # Displaying required output
     print(" Camera matrix:")
@@ -50,6 +50,8 @@ def compute_matrix():
 
 
 def update(value):
+    global i
+
     if i == max_i:
         compute_matrix()
 
