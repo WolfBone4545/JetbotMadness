@@ -3,12 +3,11 @@ import cv2
 import numpy as np
 import time
 
-K = np.array([[170.0, 0.0, 104.0],
-              [0.0, 180.0, 132.0],
-              [0.0, 0.0, 1.0]])
+# Load camera coefficients
+K = np.load("./config/matrix.npy")
 
 # Example distortion coefficients (D)
-D = np.array([2.32, 0.4, 0.04, -3.23])
+D = np.load("./config/distortion.npy")
 IMG_SHAPE = (328, 246)
 RESOLUTION_MODE = 2
 
@@ -19,7 +18,7 @@ def update(value):
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, (img.shape[1], img.shape[0]), cv2.CV_16SC2)
     image = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
 
-    cv2.imshow("test", img)
+    cv2.imshow("test", image)
     time.sleep(0.01)
     cv2.waitKey(1)
 

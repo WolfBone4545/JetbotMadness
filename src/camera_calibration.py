@@ -28,6 +28,7 @@ prev_img_shape = None
 i = 0
 max_i = 5
 path = "./imgs/"
+path_config = "./config/"
 
 
 def compute_matrix():
@@ -42,8 +43,8 @@ def compute_matrix():
     print(distortion)
 
     # save matrices
-    np.save(os.path.join(path, "matrix.npy"), matrix)
-    np.save(os.path.join(path, "distortion.npy"), distortion)
+    np.save(os.path.join(path_config, "matrix.npy"), matrix)
+    np.save(os.path.join(path_config, "distortion.npy"), distortion)
 
 
 for file in os.listdir(path):
