@@ -50,7 +50,7 @@ for file in os.listdir(path):
     if file == ".gitkeep":
         continue
 
-    image = cv2.imread(os.path.join(path, file), 0)
+    image = cv2.imread(os.path.abspath(os.path.join(path, file)), 0)
 
     grayColor = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
