@@ -5,10 +5,13 @@ import time
 
 
 def update(value):
-    cv2.imshow("test", value)
+    img = value["new"]
+
+    cv2.imshow("test", img)
     time.sleep(0.01)
-    cv2.waitKey(0)
+    cv2.waitKey(1)
 
 
-camera = Camera.instance(width=224, height=224)
+camera = Camera.instance(width=250, height=250)
+update({"new": camera.value})
 camera.observe(update, names="value")
