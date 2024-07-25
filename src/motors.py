@@ -32,11 +32,11 @@ class RobotMotors:
     elif (motor == 1):
       self.pwm.setDutycycle(self.PWMB, speed)
       if ((index == "forward") or (index == "dopredu")):
-        self.pwm.setLevel(self.BIN1, 0)
-        self.pwm.setLevel(self.BIN2, 1)
-      elif ((index == "backward") or (index == "dozadu")):
         self.pwm.setLevel(self.BIN1, 1)
         self.pwm.setLevel(self.BIN2, 0)
+      elif ((index == "backward") or (index == "dozadu")):
+        self.pwm.setLevel(self.BIN1, 0)
+        self.pwm.setLevel(self.BIN2, 1)
       else:
         print("Unkwnown direction motor B")
     else:
@@ -168,3 +168,4 @@ motors.goLeft(50, 50)
 time.sleep(2)
 motors.goRight(50, 50)
 time.sleep(2)
+motors.goForward(0)
