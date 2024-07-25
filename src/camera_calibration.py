@@ -42,15 +42,15 @@ def compute_matrix():
     print(distortion)
 
     # save matrices
-    np.save(matrix, os.path.join(path, "matrix.npy"))
-    np.save(distortion, os.path.join(path, "distortion.npy"))
+    np.save(os.path.join(path, "matrix.npy"), matrix)
+    np.save(os.path.join(path, "distortion.npy"), distortion)
 
 
 for file in os.listdir(path):
     if file == ".gitkeep":
         continue
 
-    image = cv2.imread(os.path.abspath(os.path.join(path, file)), 0)
+    image = cv2.imread(os.path.abspath(os.path.join(path, file)))
 
     grayColor = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -86,5 +86,7 @@ for file in os.listdir(path):
         cv2.waitKey(0)
 
         i += 1
+
+        print("Checked: ", i)
 
 compute_matrix()
