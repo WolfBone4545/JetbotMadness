@@ -15,12 +15,12 @@ def capture_frame(value):
 
     img = value["new"]
 
-    time.sleep(1)
-    cv2.imwrite(f"./imgs/img{i}.png", img)
-    i += 1
-
     cv2.imshow('img', img)
-    if cv2.waitKey(1) & 0xFF == ord('q'): 
+    if cv2.waitKey(1) & 0xFF == ord('d'):
+        i += 1
+        cv2.imwrite(f"./imgs/img{i}.png", img)
+        print("SAVE")
+    elif cv2.waitKey(1) & 0xFF == ord('q'):
         camera.unobserve(capture_frame, names='value')
         time.sleep(0.1)
         exit(0)
