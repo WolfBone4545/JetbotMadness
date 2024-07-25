@@ -44,7 +44,7 @@ def compute_matrix():
 
     # save matrices
     np.save(os.path.join(path_config, "matrix.npy"), matrix)
-    np.save(os.path.join(path_config, "distortion.npy"), distortion)
+    np.save(os.path.join(path_config, "distortion.npy"), distortion[1:])
 
 
 for file in os.listdir(path):
