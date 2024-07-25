@@ -1,4 +1,3 @@
-
 # Import required modules 
 from jetbot import Robot, Camera, bgr8_to_jpeg
 import cv2 
@@ -14,7 +13,8 @@ threedpoints = []
 
 # Vector for 2D points
 twodpoints = []
-img_shape = (224, 224)
+img_shape = (328*2, 224*2)
+
 
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
