@@ -1,9 +1,7 @@
-# Import required modules 
-from jetbot import Robot, Camera, bgr8_to_jpeg
-import cv2 
-import numpy as np 
-import os 
-import glob 
+# Import required modules
+import cv2
+import numpy as np
+import os
 
 # Define the dimensions of checkerboard
 CHECKERBOARD = (8, 6)
@@ -29,6 +27,7 @@ prev_img_shape = None
 
 i = 0
 max_i = 5
+path = "./imgs/"
 
 
 def compute_matrix():
@@ -42,20 +41,16 @@ def compute_matrix():
     print("\n Distortion coefficient:")
     print(distortion)
 
-    print("\n Rotation Vectors:")
-    print(r_vecs)
-
-    print("\n Translation Vectors:")
-    print(t_vecs)
+    # save matrices
+    np.save(matrix, os.path.join(path, "matrix.npy"))
+    np.save(distortion, os.path.join(path, "distortion.npy"))
 
 
-def update(value):
-    global i
+for file in os.listdir(path):
+    if file == ".gitkeep":
+        continue
 
-    if i == max_i:
-        compute_matrix()
-
-    image = value["new"]
+    image = cv2.imread(os.path.join(path, file), 0)
 
     grayColor = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -84,14 +79,12 @@ def update(value):
         # Draw and display the corners
         image = cv2.drawChessboardCorners(image,
                                           CHECKERBOARD,
-                                          corners2, ret)
+                                          corners2,
+                                          ret)
 
         cv2.imshow('img', image)
         cv2.waitKey(0)
 
         i += 1
 
-
-camera = Camera.instance(width=img_shape[0], height=img_shape[1])
-update({"new": camera.value})
-camera.observe(update, names="value")
+compute_matrix()
