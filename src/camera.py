@@ -3,12 +3,13 @@ import cv2
 import numpy as np
 import time
 
-K = np.array([[1580.0, 0.0, 1640.0],
-              [0.0, 1580.0, 1232.0],
+K = np.array([[170.0, 0.0, 104.0],
+              [0.0, 180.0, 132.0],
               [0.0, 0.0, 1.0]])
 
 # Example distortion coefficients (D)
-D = np.array([0.03, -0.05, 0.002, 0.002])
+D = np.array([-1.0, -2.32, -0.4, -0.04, 3.23])
+
 
 def update(value):
     img = value["new"]
