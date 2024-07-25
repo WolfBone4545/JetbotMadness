@@ -21,6 +21,6 @@ def update(value):
     cv2.waitKey(1)
 
 
-camera = Camera.instance(width=250, height=250)
+camera = Camera.instance(width=224, height=224)
 update({"new": camera.value})
 camera.observe(update, names="value")
