@@ -59,12 +59,12 @@ class RobotMotors:
       self.motorRun(1 , "backward", speed)
 
   def goLeft(self, speed_left, speed_right):
-      self.motorRun(0 , "backward", speed_left)
-      self.motorRun(1 , "forward", speed_right)
-
-  def goRight(self, speed_left, speed_right):
       self.motorRun(0 , "forward", speed_left)
       self.motorRun(1 , "backward", speed_right)
+
+  def goRight(self, speed_left, speed_right):
+      self.motorRun(0 , "backward", speed_left)
+      self.motorRun(1 , "forward", speed_right)
 
   def stop(self):
       self.motorStop(0)
