@@ -160,12 +160,12 @@ class PCA9685:
 # pwm.setLevel(2,1)
 
 motors = RobotMotors()
-motors.goForward(50)
-time.sleep(2)
-motors.goBackward(50)
-time.sleep(2)
-motors.goLeft(50, 50)
-time.sleep(2)
-motors.goRight(50, 50)
-time.sleep(2)
-motors.goForward(0)
+
+try:
+    while True:
+        motors.goForward(50)
+        # motors.goBackward(50)
+        # motors.goLeft(50, 50)
+        # motors.goRight(50, 50)
+except KeyboardInterrupt:
+    motors.goForward(0)
