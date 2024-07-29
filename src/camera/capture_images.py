@@ -19,7 +19,7 @@ def capture_frame(value):
     cv2.waitKey(1)
     if 0xFF == ord('d'):
         i += 1
-        cv2.imwrite(f"./imgs/img{i}.png", img)
+        cv2.imwrite(f"../imgs/img{i}.png", img)
         print("SAVE")
     elif 0xFF == ord('q'):
         camera.unobserve(capture_frame, names='value')
