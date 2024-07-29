@@ -1,4 +1,4 @@
-from jetbot import Robot, Camera, bgr8_to_jpeg
+from jetbot import Robot, Camera
 import cv2
 import numpy as np
 import time
@@ -12,11 +12,15 @@ IMG_SHAPE = (328, 246)
 RESOLUTION_MODE = 2
 
 
-def update(value):
-    img = value["new"]
-
+def undistort(img):
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, (img.shape[1], img.shape[0]), cv2.CV_16SC2)
     image = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+    return image
+
+
+def update(value):
+    img = value["new"]
+    image = undistort(img)
 
     cv2.imshow("test", image)
     time.sleep(0.01)
