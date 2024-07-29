@@ -40,11 +40,12 @@ def compute_matrix():
     print(matrix)
 
     print("\n Distortion coefficient:")
+    distortion = np.delete(distortion, 0)
     print(distortion)
 
     # save matrices
     np.save(os.path.join(path_config, "matrix.npy"), matrix)
-    np.save(os.path.join(path_config, "distortion.npy"), distortion[1:])
+    np.save(os.path.join(path_config, "distortion.npy"), distortion)
 
 
 for file in os.listdir(path):
