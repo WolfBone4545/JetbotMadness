@@ -4,10 +4,10 @@ import numpy as np
 import time
 
 # Load camera coefficients
-K = np.load("../config/matrix.npy")
+K = np.load("./config/matrix.npy")
 
 # Example distortion coefficients (D)
-D = np.load("../config/distortion.npy")
+D = np.load("./config/distortion.npy")
 IMG_SHAPE = (328, 246)
 RESOLUTION_MODE = 2
 
