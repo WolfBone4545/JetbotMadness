@@ -12,6 +12,36 @@ IMG_SHAPE = (328, 246)
 RESOLUTION_MODE = 2
 
 
+def split_mask_into_n_vert_patches(mask, n):
+    patches = []
+    step = int(mask.shape[0] / n)
+    for i in range(1, n):
+        up_step = step * i
+        prev_step = step * (i - 1)
+
+        patches.append(mask[prev_step:up_step, :])
+
+    return patches
+
+
+def compute_dev(patch):
+    # computing line deviation
+
+    contours, hierarchy = cv2.findContours(patch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    if len(contours) == 0:
+        print("Line not found")
+        return
+
+    contour = max(contours, key=cv2.contourArea)
+
+    M = cv2.moments(contour)
+	cX = int(M["m10"] / M["m00"])
+	cY = int(M["m01"] / M["m00"])
+
+    return cX, cY
+
+
 def get_line(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -19,7 +49,18 @@ def get_line(img):
 
     mask = cv2.erode(thresh1, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
-    return mask
+
+    # cut image in half
+    input_mask = mask[int(mask.shape[0] / 2):, :]
+
+    # split mask into different patches
+    patches = split_mask_into_n_vert_patches(input_mask, 4)
+    for patch in patches:
+        x, y = compute_dev(patch)
+
+        # whatever to do now I guess
+
+    return # TODO
 
 
 def undistort(img):
