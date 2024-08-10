@@ -57,10 +57,11 @@ def get_line(img):
     patches = split_mask_into_n_vert_patches(input_mask, 4)
     for patch in patches:
         x, y = compute_dev(patch)
+        print(x, y)
 
         # whatever to do now I guess
 
-    return # TODO
+    return input_mask
 
 
 def undistort(img):
