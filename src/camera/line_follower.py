@@ -16,6 +16,8 @@ def _split_mask_into_n_vert_patches(mask, n):
     step = int(mask.shape[0] / n)
     for i in range(1, n):
         up_step = step * i
+        if up_step > 656: up_step = 656
+
         prev_step = step * (i - 1)
 
         patches.append(mask[prev_step:up_step, :])
@@ -48,30 +50,32 @@ def get_roi(img,
             vert_cutting_factor,
             corner_vert_factor,
             corner_hor_factor):
-
-    # cut using vert cutting factor
     vert_size = int(img.shape[0] * vert_cutting_factor)
-    img[:vert_size, :] = 0
 
     # cut image corners
     triangle_height = int(img.shape[0] * corner_vert_factor)
     triangle_width = int(img.shape[1] * corner_hor_factor)
 
+    tri_img = img.copy()
+
     # left corner
     triangle_cnt1 = np.array([(0, vert_size + triangle_height),
                              (0, vert_size),
                              (triangle_width, vert_size)]).reshape(-1, 1, 2).astype(np.int32)
-    cv2.drawContours(img, [triangle_cnt1], 0, 0, -1)
+    cv2.drawContours(tri_img, [triangle_cnt1], 0, 0, -1)
 
     triangle_cnt2 = np.array([(img.shape[1], vert_size + triangle_height),
                              (img.shape[1], vert_size),
                              (img.shape[1] - triangle_width, vert_size)]).reshape(-1, 1, 2).astype(np.int32)
-    cv2.drawContours(img, [triangle_cnt2], 0, 0, -1)
+    cv2.drawContours(tri_img, [triangle_cnt2], 0, 0, -1)
 
-    return img
+    # cut using vert cutting factor
+    img_mod = tri_img[vert_size:, :]
+
+    return img_mod, vert_size
 
 
-def get_line(img):
+def get_line(img, vert_width):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     ret, thresh1 = cv2.threshold(blur, 80, 255, cv2.THRESH_BINARY)
@@ -88,7 +92,7 @@ def get_line(img):
             continue
 
         x = x_rel
-        y = y_rel + i * patch.shape[0]
+        y = y_rel + i * patch.shape[0] + vert_width
 
         # calculate dev
         point_dev.append((x, y))
@@ -107,12 +111,12 @@ if __name__ == "__main__":
         img = value["new"]
         image = camera_calib(img)
 
-        img_mod = get_roi(image, 0.5, 0.4, 0.3)
+        img_mod, vert_split = get_roi(image, 0.5, 0.4, 0.3)
 
-        cv2.imshow
+        cv2.imshow("triangle mask", img_mod)
+        cv2.waitKey(1)
 
-        point_dev = get_line(img_mod)
-        print(point_dev)
+        point_dev = get_line(img_mod, vert_split)
 
         for dev in point_dev:
             cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
