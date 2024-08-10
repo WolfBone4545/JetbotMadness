@@ -1,7 +1,6 @@
 from jetbot import Robot, Camera, bgr8_to_jpeg
 import cv2
 import numpy as np
-import time
 
 # Load camera coefficients
 K = np.load("./config/matrix.npy")
@@ -12,7 +11,7 @@ IMG_SHAPE = (328, 246)
 RESOLUTION_MODE = 2
 
 
-def split_mask_into_n_vert_patches(mask, n):
+def _split_mask_into_n_vert_patches(mask, n):
     patches = []
     step = int(mask.shape[0] / n)
     for i in range(1, n):
@@ -24,7 +23,7 @@ def split_mask_into_n_vert_patches(mask, n):
     return patches
 
 
-def compute_dev(patch):
+def _compute_dev(patch):
     # computing line deviation
 
     contours, hierarchy = cv2.findContours(patch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -45,7 +44,35 @@ def compute_dev(patch):
     return cX, cY
 
 
-def get_line(img):
+def get_roi(img,
+            vert_cutting_factor,
+            corner_vert_factor,
+            corner_hor_factor):
+
+    # cut using vert cutting factor
+    vert_size = int(img.shape[0] * vert_cutting_factor)
+    img_mod = img[vert_size:, :]
+
+    # cut image corners
+    triangle_height = int(img_mod.shape[0] * corner_vert_factor)
+    triangle_width = int(img_mod.shape[1] * corner_hor_factor)
+
+    # left corner
+    triangle_cnt1 = np.array([triangle_height,
+                             0,
+                             triangle_width])
+
+    cv2.drawContours(img_mod, [triangle_cnt1], 0, 0, -1)
+
+    triangle_cnt2 = np.array([img_mod.shape[0] - triangle_height,
+                             0,
+                             img_mod.shape[1] - triangle_width])
+    cv2.drawContours(img_mod, [triangle_cnt2], 0, 0, -1)
+
+    return img_mod, vert_size
+
+
+def get_line(img, cut_height):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     ret, thresh1 = cv2.threshold(blur, 80, 255, cv2.THRESH_BINARY)
@@ -53,19 +80,16 @@ def get_line(img):
     mask = cv2.erode(thresh1, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
 
-    # cut image in half
-    input_mask = mask[int(mask.shape[0] / 2):, :]
-
     # split mask into different patches
-    patches = split_mask_into_n_vert_patches(input_mask, 4)
+    patches = _split_mask_into_n_vert_patches(mask, 4)
     point_dev = []
     for i, patch in enumerate(patches):
-        x_rel, y_rel = compute_dev(patch)
+        x_rel, y_rel = _compute_dev(patch)
         if x_rel == -1:
             continue
 
         x = x_rel
-        y = y_rel + i * patch.shape[0] + input_mask.shape[0]
+        y = y_rel + i * patch.shape[0] + cut_height
 
         # calculate dev
         point_dev.append((x, y))
@@ -73,27 +97,28 @@ def get_line(img):
     return point_dev
 
 
-def undistort(img):
+def camera_calib(img):
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, (img.shape[1], img.shape[0]), cv2.CV_16SC2)
     image = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
     return image
 
 
-def update(value):
-    img = value["new"]
-    image = undistort(img)
-
-    point_dev = get_line(image)
-    print(point_dev)
-
-    for dev in point_dev:
-        cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
-
-    cv2.imshow("test", image)
-    cv2.waitKey(1)
-
-
 if __name__ == "__main__":
+    def update(value):
+        img = value["new"]
+        image = camera_calib(img)
+
+        img_mod, cut_height = get_roi(image, 0.5, 0.2, 0.15)
+        point_dev = get_line(img_mod, cut_height)
+        print(point_dev)
+
+        for dev in point_dev:
+            cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
+
+        cv2.imshow("test", image)
+        cv2.waitKey(1)
+
+
     camera = Camera.instance(width=int(IMG_SHAPE[0]*RESOLUTION_MODE), height=int(IMG_SHAPE[1]*RESOLUTION_MODE), fps=10)
     update({"new": camera.value})
     camera.observe(update, names="value")
