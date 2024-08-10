@@ -36,8 +36,8 @@ def compute_dev(patch):
     contour = max(contours, key=cv2.contourArea)
 
     M = cv2.moments(contour)
-	cX = int(M["m10"] / M["m00"])
-	cY = int(M["m01"] / M["m00"])
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
 
     return cX, cY
 
