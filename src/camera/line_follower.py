@@ -56,16 +56,16 @@ def get_line(img):
     # split mask into different patches
     patches = split_mask_into_n_vert_patches(input_mask, 4)
     point_dev = []
-    for patch in patches:
-        x, y = compute_dev(patch)
+    for i, patch in enumerate(patches):
+        x_rel, y_rel = compute_dev(patch)
+
+        x = x_rel + i * patch.shape[1]
+        y = y_rel + i * patch.shape[0]
 
         # calculate relative dev
         point_dev.append((x / input_mask.shape[1], y / input_mask.shape[0]))
 
-        # note into patch
-        cv2.circle(patch, (x, y), 5, 125, -1)
-
-    return point_dev, patches[0]
+    return point_dev
 
 
 def undistort(img):
@@ -78,12 +78,16 @@ def update(value):
     img = value["new"]
     image = undistort(img)
 
-    point_dev, image_mask = get_line(image)
+    point_dev = get_line(image)
     print(point_dev)
 
-    cv2.imshow("test", image_mask)
+    for dev in point_dev:
+        cv2.circle(image, (dev[0], dev[0]), 5, (255, 0, 0), -1)
+
+    cv2.imshow("test", image)
     time.sleep(0.01)
     cv2.waitKey(1)
+
 
 if __name__ == "__main__":
     camera = Camera.instance(width=int(IMG_SHAPE[0]*RESOLUTION_MODE), height=int(IMG_SHAPE[1]*RESOLUTION_MODE))
