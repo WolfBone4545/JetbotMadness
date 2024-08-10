@@ -31,13 +31,16 @@ def compute_dev(patch):
 
     if len(contours) == 0:
         print("Line not found")
-        return
+        return -1, -1
 
     contour = max(contours, key=cv2.contourArea)
 
     M = cv2.moments(contour)
-    cX = int(M["m10"] / M["m00"])
-    cY = int(M["m01"] / M["m00"])
+    try:
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+    except ZeroDivisionError:
+        return -1, -1
 
     return cX, cY
 
@@ -45,7 +48,7 @@ def compute_dev(patch):
 def get_line(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    ret, thresh1 = cv2.threshold(blur, 100, 255, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(blur, 80, 255, cv2.THRESH_BINARY)
 
     mask = cv2.erode(thresh1, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
@@ -58,12 +61,14 @@ def get_line(img):
     point_dev = []
     for i, patch in enumerate(patches):
         x_rel, y_rel = compute_dev(patch)
+        if x_rel == -1:
+            continue
 
-        x = x_rel + i * patch.shape[1]
-        y = y_rel + i * patch.shape[0]
+        x = x_rel
+        y = y_rel + i * patch.shape[0] + input_mask.shape[0]
 
-        # calculate relative dev
-        point_dev.append((x / input_mask.shape[1], y / input_mask.shape[0]))
+        # calculate dev
+        point_dev.append((x, y))
 
     return point_dev
 
@@ -82,14 +87,13 @@ def update(value):
     print(point_dev)
 
     for dev in point_dev:
-        cv2.circle(image, (dev[0], dev[0]), 5, (255, 0, 0), -1)
+        cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
 
     cv2.imshow("test", image)
-    time.sleep(0.01)
     cv2.waitKey(1)
 
 
 if __name__ == "__main__":
-    camera = Camera.instance(width=int(IMG_SHAPE[0]*RESOLUTION_MODE), height=int(IMG_SHAPE[1]*RESOLUTION_MODE))
+    camera = Camera.instance(width=int(IMG_SHAPE[0]*RESOLUTION_MODE), height=int(IMG_SHAPE[1]*RESOLUTION_MODE), fps=10)
     update({"new": camera.value})
     camera.observe(update, names="value")
