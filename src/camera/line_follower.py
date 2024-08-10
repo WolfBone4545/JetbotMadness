@@ -51,28 +51,27 @@ def get_roi(img,
 
     # cut using vert cutting factor
     vert_size = int(img.shape[0] * vert_cutting_factor)
-    img_mod = img[vert_size:, :]
+    img[:vert_size, :] = 0
 
     # cut image corners
-    triangle_height = int(img_mod.shape[0] * corner_vert_factor)
-    triangle_width = int(img_mod.shape[1] * corner_hor_factor)
+    triangle_height = int(img.shape[0] * corner_vert_factor)
+    triangle_width = int(img.shape[1] * corner_hor_factor)
 
     # left corner
-    triangle_cnt1 = np.array([triangle_height,
-                             0,
-                             triangle_width])
+    triangle_cnt1 = np.array([(0, vert_size + triangle_height),
+                             (0, vert_size),
+                             (triangle_width, vert_size)]).reshape(-1, 1, 2).astype(np.int32)
+    cv2.drawContours(img, [triangle_cnt1], 0, 0, -1)
 
-    cv2.drawContours(img_mod, [triangle_cnt1], 0, 0, -1)
+    triangle_cnt2 = np.array([(img.shape[1], vert_size + triangle_height),
+                             (img.shape[1], vert_size),
+                             (img.shape[1] - triangle_width, vert_size)]).reshape(-1, 1, 2).astype(np.int32)
+    cv2.drawContours(img, [triangle_cnt2], 0, 0, -1)
 
-    triangle_cnt2 = np.array([img_mod.shape[0] - triangle_height,
-                             0,
-                             img_mod.shape[1] - triangle_width])
-    cv2.drawContours(img_mod, [triangle_cnt2], 0, 0, -1)
-
-    return img_mod, vert_size
+    return img
 
 
-def get_line(img, cut_height):
+def get_line(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     ret, thresh1 = cv2.threshold(blur, 80, 255, cv2.THRESH_BINARY)
@@ -89,7 +88,7 @@ def get_line(img, cut_height):
             continue
 
         x = x_rel
-        y = y_rel + i * patch.shape[0] + cut_height
+        y = y_rel + i * patch.shape[0]
 
         # calculate dev
         point_dev.append((x, y))
@@ -108,8 +107,11 @@ if __name__ == "__main__":
         img = value["new"]
         image = camera_calib(img)
 
-        img_mod, cut_height = get_roi(image, 0.5, 0.2, 0.15)
-        point_dev = get_line(img_mod, cut_height)
+        img_mod = get_roi(image, 0.5, 0.4, 0.3)
+
+        cv2.imshow
+
+        point_dev = get_line(img_mod)
         print(point_dev)
 
         for dev in point_dev:
