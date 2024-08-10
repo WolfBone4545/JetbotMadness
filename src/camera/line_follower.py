@@ -45,7 +45,7 @@ def compute_dev(patch):
 def get_line(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    ret, thresh1 = cv2.threshold(blur, 100, 255, cv2.THRESH_BINARY_INV)
+    ret, thresh1 = cv2.threshold(blur, 100, 255, cv2.THRESH_BINARY)
 
     mask = cv2.erode(thresh1, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
@@ -55,13 +55,17 @@ def get_line(img):
 
     # split mask into different patches
     patches = split_mask_into_n_vert_patches(input_mask, 4)
+    point_dev = []
     for patch in patches:
         x, y = compute_dev(patch)
-        print(x, y)
 
-        # whatever to do now I guess
+        # calculate relative dev
+        point_dev.append((x / input_mask.shape[1], y / input_mask.shape[0]))
 
-    return input_mask
+        # note into patch
+        cv2.circle(patch, (x, y), 5, 125, -1)
+
+    return point_dev, patches[0]
 
 
 def undistort(img):
@@ -74,13 +78,14 @@ def update(value):
     img = value["new"]
     image = undistort(img)
 
-    image_mask = get_line(image)
+    point_dev, image_mask = get_line(image)
+    print(point_dev)
 
     cv2.imshow("test", image_mask)
     time.sleep(0.01)
     cv2.waitKey(1)
 
-
-camera = Camera.instance(width=int(IMG_SHAPE[0]*RESOLUTION_MODE), height=int(IMG_SHAPE[1]*RESOLUTION_MODE))
-update({"new": camera.value})
-camera.observe(update, names="value")
+if __name__ == "__main__":
+    camera = Camera.instance(width=int(IMG_SHAPE[0]*RESOLUTION_MODE), height=int(IMG_SHAPE[1]*RESOLUTION_MODE))
+    update({"new": camera.value})
+    camera.observe(update, names="value")
