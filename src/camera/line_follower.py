@@ -74,17 +74,17 @@ def get_roi(img,
 
     return img_mod, vert_size
 
+def thresh(img, iters, threshold):
+    blur = cv2.GaussianBlur(img, (5, 5), 0)
+    ret, thresh = cv2.threshold(blur, threshold, 255, cv2.THRESH_BINARY)
 
-def get_line(img, vert_width):
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    ret, thresh1 = cv2.threshold(blur, 80, 255, cv2.THRESH_BINARY)
+    mask = cv2.erode(thresh, None, iterations=iters)
+    mask = cv2.dilate(mask, None, iterations=iters)
 
-    mask = cv2.erode(thresh1, None, iterations=2)
-    mask = cv2.dilate(mask, None, iterations=2)
+    return mask
 
-    # split mask into different patches
-    patches = _split_mask_into_n_vert_patches(mask, 4)
+def parse_patches(img, vert_width):
+    patches = _split_mask_into_n_vert_patches(img, 10)
     point_dev = []
     for i, patch in enumerate(patches):
         x_rel, y_rel = _compute_dev(patch)
@@ -99,6 +99,26 @@ def get_line(img, vert_width):
 
     return point_dev
 
+def get_line(img, vert_width):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    green = img[:, :, 1]
+    red = img[:, :, 2]
+
+    only_white = thresh(gray, 2, 160)
+    thresh_green = thresh(green, 3, 110)
+    thresh_red = thresh(red, 3, 110)
+
+    yellow_and_white = cv2.bitwise_and(thresh_green, thresh_red)
+
+    only_yellow = cv2.bitwise_and(cv2.bitwise_not(only_white), yellow_and_white)
+    only_yellow = cv2.erode(only_yellow, None, iterations=3)
+
+    # split mask into different patches
+
+    yellow_dev_points = parse_patches(only_yellow, vert_width)
+    white_dev_points = parse_patches(only_white, vert_width)
+
+    return yellow_dev_points, white_dev_points
 
 def camera_calib(img):
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, (img.shape[1], img.shape[0]), cv2.CV_16SC2)
@@ -116,10 +136,13 @@ if __name__ == "__main__":
         cv2.imshow("triangle mask", img_mod)
         cv2.waitKey(1)
 
-        point_dev = get_line(img_mod, vert_split)
+        yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
 
-        for dev in point_dev:
+        for dev in yel_point_dev:
             cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
+
+        for dev in white_point_dev:
+            cv2.circle(image, (dev[0], dev[1]), 5, (0, 0, 255), -1)
 
         cv2.imshow("test", image)
         cv2.waitKey(1)
