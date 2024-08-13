@@ -99,12 +99,30 @@ def parse_patches(img, vert_width):
 
     return point_dev
 
+def get_right_white_line(white_mask):
+    result_mask = np.zeros_like(white_mask)
+    contours, hierarchy = cv2.findContours(white_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    right_points = []
+
+    if len(contours) == 0 or len(contours) == 3:
+        return -1
+
+    for contour in contours:
+        right_points.append(tuple(contour[contour[:, :, 0].argmin()][0])[0])
+
+    max_elem = max(right_points)
+    right_line_index = right_points.index(max_elem)
+
+    cv2.drawContours(result_mask, contours, right_line_index, 255, -1)
+    return result_mask
+
 def get_line(img, vert_width):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     green = img[:, :, 1]
     red = img[:, :, 2]
 
     only_white = thresh(gray, 2, 160)
+
     thresh_green = thresh(green, 3, 110)
     thresh_red = thresh(red, 3, 110)
 
@@ -113,6 +131,14 @@ def get_line(img, vert_width):
     only_yellow = cv2.bitwise_and(cv2.bitwise_not(only_white), yellow_and_white)
     only_yellow = cv2.erode(only_yellow, None, iterations=3)
 
+    only_white = get_right_white_line(only_white)
+
+    if isinstance(only_white, int):
+        return -1, -1
+
+    cv2.imshow("xd", only_white)
+    cv2.waitKey(1)
+    
     # split mask into different patches
 
     yellow_dev_points = parse_patches(only_yellow, vert_width)
@@ -133,10 +159,9 @@ if __name__ == "__main__":
 
         img_mod, vert_split = get_roi(image, 0.5, 0.4, 0.3)
 
-        cv2.imshow("triangle mask", img_mod)
-        cv2.waitKey(1)
-
         yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
+        if isinstance(yel_point_dev, int):
+            return
 
         for dev in yel_point_dev:
             cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
