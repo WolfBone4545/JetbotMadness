@@ -31,7 +31,6 @@ def _compute_dev(patch):
     contours, hierarchy = cv2.findContours(patch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     if len(contours) == 0:
-        print("Line not found")
         return -1, -1
 
     contour = max(contours, key=cv2.contourArea)
