@@ -1,1 +1,7 @@
 /src/imgs/
+
+# dataset
+/src_neural/source/*
+!/src_neural/source/.gitkeep
+!/src_neural/source/README.dataset.txt
+!/src_neural/source/README.roboflow.txt
