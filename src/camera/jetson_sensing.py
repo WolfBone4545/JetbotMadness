@@ -1,7 +1,5 @@
 import utils
 import cv2
-import numpy as np
-import time
 
 
 def sense_jetson(image):
@@ -17,7 +15,7 @@ def sense_jetson(image):
     if ids is not None:
 
         marker_size_cm = 15.0 # TODO
-        rvec , tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size_cm, utils.K, utils.D)
+        rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size_cm, utils.K, utils.D)
         print(rvec, tvec)
 
 if __name__ == "__main__":
