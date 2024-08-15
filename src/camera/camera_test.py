@@ -10,4 +10,4 @@ def callback(image):
 
 
 if __name__ == "__main__":
-    utils.run_camera_with_callback()
+    utils.run_camera_with_callback(callback)
