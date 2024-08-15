@@ -13,6 +13,7 @@ def sense_jetson(image):
     detector = cv2.aruco.ArucoDetector(dictionary, parameters)
 
     corners, ids, rejected = detector.detectMarkers(image)
+    print(corners)
     if ids is not None:
 
         marker_size_cm = 15.0 # TODO

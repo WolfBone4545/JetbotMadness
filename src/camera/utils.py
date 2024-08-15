@@ -20,7 +20,7 @@ def camera_calib(img):
 
 def run_camera_with_callback(callback):
     def update(value):
-        img = value
+        img = value["new"]
         image = camera_calib(img)
         callback(image)
 

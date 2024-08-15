@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from jetbot import GPIO
+import RPi.GPIO as GPIO
 
 
 class decoder:
@@ -17,12 +17,12 @@ class decoder:
 
         self.lastGpio = None
 
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup([gpioA, gpioB], GPIO.IN)
-        self.cbA = GPIO.add_event_detect(gpioA, GPIO.BOTH, callback=self._pulse, bouncetime=10, polltime=0.2)
-        self.cbB = GPIO.add_event_detect(gpioB, GPIO.BOTH, callback=self._pulse, bouncetime=10, polltime=0.2)
+        self.cbA = GPIO.add_event_detect(gpioA, GPIO.BOTH, callback=self._pulse, bouncetime=None)
+        self.cbB = GPIO.add_event_detect(gpioB, GPIO.BOTH, callback=self._pulse, bouncetime=None)
 
-    def _pulse(self, gpio, level, tick):
+    def _pulse(self, gpio):
 
         """
         Decode the rotary encoder pulse.
@@ -39,6 +39,8 @@ class decoder:
              |         |         |         |
          ----+         +---------+         +---------+  1
         """
+
+        level = GPIO.input(gpio)
 
         if gpio == self.gpioA:
             self.levA = level
@@ -72,11 +74,14 @@ if __name__ == "__main__":
         pos_r += way
         print("pos_r={}".format(pos_r))
 
-    decoder_l = rotary_encoder.decoder(22, 10, callback_l)
-    decoder_r = rotary_encoder.decoder( 9, 11, callback_r)
+    decoder_l = decoder(22, 10, callback_l)
+    decoder_r = decoder( 9, 11, callback_r)
+
+    print("runnung")
 
     try:
         while True:
-            time.sleep(1)
+            pass
     finally:
         GPIO.cleanup()  # cleanup all GPIOs
+        print("endung")

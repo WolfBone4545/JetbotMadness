@@ -5,3 +5,6 @@
 !/src_neural/source/.gitkeep
 !/src_neural/source/README.dataset.txt
 !/src_neural/source/README.roboflow.txt
+
+# python generated files
+/src/camera/__pycache__
