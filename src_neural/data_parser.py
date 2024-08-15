@@ -67,6 +67,9 @@ def dataset_test(dataloader):
     for data in dataloader:
         image = data[0][0]
         obj_class = data[1][0][0]
+        obj_class_conv = int(torch.nonzero(obj_class)[0][1])
+        print(obj_class_conv)
+
         bbox = data[1][1][0]
 
         image = torch.permute(image, (1, 2, 0))
@@ -82,6 +85,8 @@ def dataset_test(dataloader):
         y2 = int(bbox[3] * height)
 
         cv2.rectangle(np_image_mod, (x1, y1), (x2, y2), (255, 0, 0), 2)
+        cv2.putText(np_image_mod, "Class: " + str(obj_class_conv), (x1, y1), cv2.FONT_HERSHEY_SIMPLEX,
+                    1, (255, 0, 0), 2, cv2.LINE_AA)
 
         cv2.imshow("test", np_image_mod)
         cv2.waitKey(0)

@@ -1,14 +1,6 @@
-from jetbot import Robot, Camera, bgr8_to_jpeg
 import cv2
 import numpy as np
-
-# Load camera coefficients
-K = np.load("./config/matrix.npy")
-
-# Example distortion coefficients (D)
-D = np.load("./config/distortion.npy")
-IMG_SHAPE = (328, 246)
-RESOLUTION_MODE = 2
+import utils
 
 
 def _split_mask_into_n_vert_patches(mask, n):
@@ -73,6 +65,7 @@ def get_roi(img,
 
     return img_mod, vert_size
 
+
 def thresh(img, iters, threshold):
     blur = cv2.GaussianBlur(img, (5, 5), 0)
     ret, thresh = cv2.threshold(blur, threshold, 255, cv2.THRESH_BINARY)
@@ -81,6 +74,7 @@ def thresh(img, iters, threshold):
     mask = cv2.dilate(mask, None, iterations=iters)
 
     return mask
+
 
 def parse_patches(img, vert_width):
     patches = _split_mask_into_n_vert_patches(img, 10)
@@ -98,6 +92,7 @@ def parse_patches(img, vert_width):
 
     return point_dev
 
+
 def get_right_white_line(white_mask):
     result_mask = np.zeros_like(white_mask)
     contours, hierarchy = cv2.findContours(white_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -114,6 +109,7 @@ def get_right_white_line(white_mask):
 
     cv2.drawContours(result_mask, contours, right_line_index, 255, -1)
     return result_mask
+
 
 def get_line(img, vert_width):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -137,7 +133,7 @@ def get_line(img, vert_width):
 
     cv2.imshow("xd", only_white)
     cv2.waitKey(1)
-    
+
     # split mask into different patches
 
     yellow_dev_points = parse_patches(only_yellow, vert_width)
@@ -145,33 +141,23 @@ def get_line(img, vert_width):
 
     return yellow_dev_points, white_dev_points
 
-def camera_calib(img):
-    map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, (img.shape[1], img.shape[0]), cv2.CV_16SC2)
-    image = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-    return image
+
+def line_follower(image):
+    img_mod, vert_split = get_roi(image, 0.5, 0.4, 0.3)
+
+    yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
+    if isinstance(yel_point_dev, int):
+        return
+
+    for dev in yel_point_dev:
+        cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
+
+    for dev in white_point_dev:
+        cv2.circle(image, (dev[0], dev[1]), 5, (0, 0, 255), -1)
+
+    cv2.imshow("test", image)
+    cv2.waitKey(1)
 
 
 if __name__ == "__main__":
-    def update(value):
-        img = value["new"]
-        image = camera_calib(img)
-
-        img_mod, vert_split = get_roi(image, 0.5, 0.4, 0.3)
-
-        yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
-        if isinstance(yel_point_dev, int):
-            return
-
-        for dev in yel_point_dev:
-            cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
-
-        for dev in white_point_dev:
-            cv2.circle(image, (dev[0], dev[1]), 5, (0, 0, 255), -1)
-
-        cv2.imshow("test", image)
-        cv2.waitKey(1)
-
-
-    camera = Camera.instance(width=int(IMG_SHAPE[0]*RESOLUTION_MODE), height=int(IMG_SHAPE[1]*RESOLUTION_MODE), fps=10)
-    update({"new": camera.value})
-    camera.observe(update, names="value")
+    utils.run_camera_with_callback(line_follower)
