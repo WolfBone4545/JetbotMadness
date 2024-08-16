@@ -40,7 +40,7 @@ def process_aruco(aruco, id, image):
                 (topLeft[0], topLeft[1] - 15), cv2.FONT_HERSHEY_SIMPLEX,
                 0.5, (0, 255, 0), 2)
 
-    middle_point_x = int(bottomLeft[0] - abs(bottomLeft[0] - bottomRight[0]) / 2)
+    middle_point_x = int(bottomLeft[0] + abs(bottomLeft[0] - bottomRight[0]) / 2)
     middle_point_y = int(bottomLeft[1] - abs(bottomLeft[1] - topLeft[1]) / 2)
 
     cv2.circle(image, (middle_point_x, middle_point_y), 5, (0, 0, 255), -1)
@@ -50,7 +50,7 @@ def process_aruco(aruco, id, image):
 
 def jetson_sensing(image):
     aruco_dict = detect_aruco(image)
-    for i, aruco in aruco_dict["aruco"]:
+    for i, aruco in enumerate(aruco_dict["aruco"]):
         aruco_id = aruco_dict["id"][i]
 
         middle_point, object_id, distance = process_aruco(aruco, aruco_id, image)
