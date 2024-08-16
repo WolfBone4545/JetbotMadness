@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import RPi.GPIO as GPIO
+import Jetson.GPIO as GPIO, time
 
 
 class decoder:
@@ -19,8 +19,26 @@ class decoder:
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup([gpioA, gpioB], GPIO.IN)
-        self.cbA = GPIO.add_event_detect(gpioA, GPIO.BOTH, callback=self._pulse, bouncetime=None)
-        self.cbB = GPIO.add_event_detect(gpioB, GPIO.BOTH, callback=self._pulse, bouncetime=None)
+        self.cbAr = GPIO.add_event_detect(self.gpioA, GPIO.RISING, callback=self._cb_A_r, bouncetime=None, polltime=1)
+        self.cbAf = GPIO.add_event_detect(self.gpioA, GPIO.FALLING, callback=self._cb_A_f, bouncetime=None, polltime=1)
+        self.cbBr = GPIO.add_event_detect(self.gpioB, GPIO.RISING, callback=self._cb_B_r, bouncetime=None, polltime=1)
+        self.cbBf = GPIO.add_event_detect(self.gpioB, GPIO.FALLING, callback=self._cb_B_f, bouncetime=None, polltime=1)
+
+    def _cb_A_r(self, gpio):
+        self.levA = 1
+        if self.levB == 1:
+            self.callback(1)
+
+    def _cb_A_f(self, gpio):
+        self.levA = 0
+
+    def _cb_B_r(self, gpio):
+        self.levB = 1
+        if self.levA == 1:
+            self.callback(-1)
+
+    def _cb_B_f(self, gpio):
+        self.levB = 0
 
     def _pulse(self, gpio):
 
