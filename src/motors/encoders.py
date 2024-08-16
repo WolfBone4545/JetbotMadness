@@ -4,7 +4,20 @@ import Jetson.GPIO as GPIO, time
 
 
 class decoder:
-    """Class to decode magnetic rotary encoder pulses."""
+    """Class to decode magnetic rotary encoder pulses.
+
+               +---------+         +---------+      0
+               |         |         |         |
+     A         |         |         |         |
+               |         |         |         |
+     +---------+         +---------+         +----- 1
+
+         +---------+         +---------+            0
+         |         |         |         |
+     B   |         |         |         |
+         |         |         |         |
+     ----+         +---------+         +---------+  1
+    """
 
     def __init__(self, gpioA, gpioB, callback):
 
@@ -39,41 +52,6 @@ class decoder:
 
     def _cb_B_f(self, gpio):
         self.levB = 0
-
-    def _pulse(self, gpio):
-
-        """
-        Decode the rotary encoder pulse.
-
-                   +---------+         +---------+      0
-                   |         |         |         |
-         A         |         |         |         |
-                   |         |         |         |
-         +---------+         +---------+         +----- 1
-
-             +---------+         +---------+            0
-             |         |         |         |
-         B   |         |         |         |
-             |         |         |         |
-         ----+         +---------+         +---------+  1
-        """
-
-        level = GPIO.input(gpio)
-
-        if gpio == self.gpioA:
-            self.levA = level
-        else:
-            self.levB = level
-
-        if gpio != self.lastGpio:  # debounce
-            self.lastGpio = gpio
-
-            if gpio == self.gpioA and level == 1:
-                if self.levB == 1:
-                    self.callback(1)
-            elif gpio == self.gpioB and level == 1:
-                if self.levA == 1:
-                    self.callback(-1)
 
 
 if __name__ == "__main__":
