@@ -1,5 +1,6 @@
 import utils
 import cv2
+import time
 
 
 def sense_jetson(image):
@@ -7,10 +8,9 @@ def sense_jetson(image):
     cv2.waitKey(1)
 
     dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
-    parameters = cv2.aruco.DetectorParameters()
-    detector = cv2.aruco.ArucoDetector(dictionary, parameters)
+    parameters = cv2.aruco.DetectorParameters_create()
 
-    corners, ids, rejected = detector.detectMarkers(image)
+    corners, ids, rejected = cv2.aruco.detectMarkers(image, dictionary, parameters=parameters)
     print(corners)
     if ids is not None:
 
