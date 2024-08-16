@@ -10,7 +10,7 @@ K = np.load("./config/matrix.npy")
 D = np.load("./config/distortion.npy")
 IMG_SHAPE = (328, 246)
 RESOLUTION_MODE = 2
-
+ARUCO_MARKER_SIZE = 5.0
 
 def camera_calib(img):
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, (img.shape[1], img.shape[0]), cv2.CV_16SC2)
