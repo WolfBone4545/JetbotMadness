@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from jetbot import Camera, Robot
+from jetbot import Camera, bgr8_jpeg
 
 
 # Load camera coefficients
@@ -20,7 +20,7 @@ def camera_calib(img):
 
 def run_camera_with_callback(callback):
     def update(value):
-        img = value["new"]
+        img = bgr8_jpeg(value["new"])
         image = camera_calib(img)
         callback(image)
 
