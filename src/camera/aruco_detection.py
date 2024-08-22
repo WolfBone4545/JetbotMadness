@@ -1,6 +1,5 @@
 import utils
 import cv2
-import time
 
 
 def detect_aruco(image):
@@ -16,7 +15,7 @@ def detect_aruco(image):
         }
 
 
-def process_aruco(aruco, id, image):
+def process_aruco(aruco, id):
     corners = aruco.reshape((4, 2))
     (topLeft, topRight, bottomRight, bottomLeft) = corners
     # convert each of the (x, y)-coordinate pairs to integers
@@ -30,33 +29,29 @@ def process_aruco(aruco, id, image):
     aruco_dist = round(tvec[0][0][2], 2)
     aruco_id = id
 
-    # drawing
-    cv2.line(image, topLeft, topRight, (0, 255, 0), 2)
-    cv2.line(image, topRight, bottomRight, (0, 255, 0), 2)
-    cv2.line(image, bottomRight, bottomLeft, (0, 255, 0), 2)
-    cv2.line(image, bottomLeft, topLeft, (0, 255, 0), 2)
-
-    cv2.putText(image, f"id: {aruco_id}, dist: {aruco_dist}",
-                (topLeft[0], topLeft[1] - 15), cv2.FONT_HERSHEY_SIMPLEX,
-                0.5, (0, 255, 0), 2)
-
     middle_point_x = int(bottomLeft[0] + abs(bottomLeft[0] - bottomRight[0]) / 2)
     middle_point_y = int(bottomLeft[1] - abs(bottomLeft[1] - topLeft[1]) / 2)
-
-    cv2.circle(image, (middle_point_x, middle_point_y), 5, (0, 0, 255), -1)
 
     return (middle_point_x, middle_point_y), aruco_id, aruco_dist
 
 
-def jetson_sensing(image):
+def detect_arucos(image):
+    aruco_list = []
     aruco_dict = detect_aruco(image)
     for i, aruco in enumerate(aruco_dict["aruco"]):
         aruco_id = aruco_dict["id"][i]
 
-        middle_point, object_id, distance = process_aruco(aruco, aruco_id, image)
+        middle_point, object_id, distance = process_aruco(aruco, aruco_id)
+        aruco_list.append([middle_point, object_id, distance])
+
+
+def aruco_detection(image):
+    aruco_list = detect_arucos(image)
+    print(aruco_list)
 
     cv2.imshow("test", image)
     cv2.waitKey(1)
 
+
 if __name__ == "__main__":
-    utils.run_camera_with_callback(jetson_sensing)
+    utils.run_camera_with_callback(aruco_detection)
