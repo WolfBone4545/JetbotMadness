@@ -68,7 +68,7 @@ def get_roi(img,
 
 def thresh(img, iters, threshold):
     blur = cv2.GaussianBlur(img, (5, 5), 0)
-    ret, thresh = cv2.threshold(blur, threshold, 255, cv2.THRESH_BINARY)
+    ret, thresh = cv2.threshold(blur, threshold, 255, cv2.THRESH_OTSU)
 
     mask = cv2.erode(thresh, None, iterations=iters)
     mask = cv2.dilate(mask, None, iterations=iters)
