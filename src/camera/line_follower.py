@@ -121,6 +121,10 @@ def get_line(img):
     thresh_green = thresh(green, 3, 110)
     thresh_red = thresh(red, 3, 110)
 
+    cv2.imshow("ow", only_white)
+    cv2.imshow("gr", thresh_green)
+    cv2.imshow("rd", thresh_red)
+
     only_white, vert_width = get_roi(only_white, 0.5, 0.4, 0.3)
 
     thresh_green, vert_width = get_roi(thresh_green, 0.5, 0.4, 0.3)
