@@ -111,7 +111,7 @@ def get_right_white_line(white_mask):
     return result_mask
 
 
-def get_line(img, vert_width):
+def get_line(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     green = img[:, :, 1]
     red = img[:, :, 2]
@@ -120,6 +120,11 @@ def get_line(img, vert_width):
 
     thresh_green = thresh(green, 3, 110)
     thresh_red = thresh(red, 3, 110)
+
+    only_white, vert_width = get_roi(only_white, 0.5, 0.4, 0.3)
+
+    thresh_green, vert_width = get_roi(thresh_green, 0.5, 0.4, 0.3)
+    thresh_red, vert_width = get_roi(thresh_red, 0.5, 0.4, 0.3)
 
     yellow_and_white = cv2.bitwise_and(thresh_green, thresh_red)
 
@@ -143,9 +148,7 @@ def get_line(img, vert_width):
 
 
 def line_follower(image):
-    img_mod, vert_split = get_roi(image, 0.5, 0.4, 0.3)
-
-    yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
+    yel_point_dev, white_point_dev = get_line(image)
     if isinstance(yel_point_dev, int):
         return
 
