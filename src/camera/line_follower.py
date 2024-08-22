@@ -53,12 +53,12 @@ def get_roi(img,
     triangle_cnt1 = np.array([(0, vert_size + triangle_height),
                              (0, vert_size),
                              (triangle_width, vert_size)]).reshape(-1, 1, 2).astype(np.int32)
-    cv2.drawContours(tri_img, [triangle_cnt1], 0, [127, 127, 127], -1)
+    cv2.drawContours(tri_img, [triangle_cnt1], 0, 0, -1)
 
     triangle_cnt2 = np.array([(img.shape[1], vert_size + triangle_height),
                              (img.shape[1], vert_size),
                              (img.shape[1] - triangle_width, vert_size)]).reshape(-1, 1, 2).astype(np.int32)
-    cv2.drawContours(tri_img, [triangle_cnt2], 0, [127, 127, 127], -1)
+    cv2.drawContours(tri_img, [triangle_cnt2], 0, 0, -1)
 
     # cut using vert cutting factor
     img_mod = tri_img[vert_size:, :]
