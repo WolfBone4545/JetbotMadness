@@ -53,12 +53,12 @@ def get_roi(img,
     triangle_cnt1 = np.array([(0, vert_size + triangle_height),
                              (0, vert_size),
                              (triangle_width, vert_size)]).reshape(-1, 1, 2).astype(np.int32)
-    cv2.drawContours(tri_img, [triangle_cnt1], 0, 0, -1)
+    cv2.drawContours(tri_img, [triangle_cnt1], 0, [127, 127, 127], -1)
 
     triangle_cnt2 = np.array([(img.shape[1], vert_size + triangle_height),
                              (img.shape[1], vert_size),
                              (img.shape[1] - triangle_width, vert_size)]).reshape(-1, 1, 2).astype(np.int32)
-    cv2.drawContours(tri_img, [triangle_cnt2], 0, 0, -1)
+    cv2.drawContours(tri_img, [triangle_cnt2], 0, [127, 127, 127], -1)
 
     # cut using vert cutting factor
     img_mod = tri_img[vert_size:, :]
@@ -111,7 +111,7 @@ def get_right_white_line(white_mask):
     return result_mask
 
 
-def get_line(img):
+def get_line(img, vert_width):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     green = img[:, :, 1]
     red = img[:, :, 2]
@@ -120,15 +120,6 @@ def get_line(img):
 
     thresh_green = thresh(green, 3, 110)
     thresh_red = thresh(red, 3, 110)
-
-    cv2.imshow("ow", only_white)
-    cv2.imshow("gr", thresh_green)
-    cv2.imshow("rd", thresh_red)
-
-    only_white, vert_width = get_roi(only_white, 0.5, 0.4, 0.3)
-
-    thresh_green, vert_width = get_roi(thresh_green, 0.5, 0.4, 0.3)
-    thresh_red, vert_width = get_roi(thresh_red, 0.5, 0.4, 0.3)
 
     yellow_and_white = cv2.bitwise_and(thresh_green, thresh_red)
 
@@ -152,7 +143,9 @@ def get_line(img):
 
 
 def line_follower(image):
-    yel_point_dev, white_point_dev = get_line(image)
+    img_mod, vert_split = get_roi(image, 0.5, 0.4, 0.3)
+
+    yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
     if isinstance(yel_point_dev, int):
         return
 
