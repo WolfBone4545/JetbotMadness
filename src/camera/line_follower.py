@@ -85,10 +85,11 @@ def get_roi(img,
 
     tri_img = img.copy()
 
-    rect = [(polygon_up, vert_size),
-            (img.shape[0]-polygon_up, vert_size),
-            (polygon_down, img.shape[1]-1),
-            (img.shape[0]-polygon_down, img.shape[1]-1)]
+    rect = np.array([
+            [polygon_up, vert_size],
+            [img.shape[0]-polygon_up, vert_size],
+            [polygon_down, img.shape[1]-1],
+            [img.shape[0]-polygon_down, img.shape[1]-1]], dtype="float32")
 
     img_mod = four_point_transform(tri_img, rect, vert_size)
 
