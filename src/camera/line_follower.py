@@ -62,16 +62,16 @@ def four_point_transform(image, rect, vert_size):
     # order
     dst = np.array([
         [0, 0],
-        [image.shape[0]-1, 0],
-        [image.shape[0]-1, vert_size],
-        [0, vert_size]], dtype="float32")
+        [maxWidth-1, 0],
+        [maxWidth-1, maxHeight-1],
+        [0, maxHeight-1]], dtype="float32")
 
     # compute the perspective transform matrix and then apply it
     M = cv2.getPerspectiveTransform(rect, dst)
     warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
 
     # return the warped image
-    return warped
+    return warped, maxHeight
 
 def get_roi(img,
             vert_cutting_factor,
@@ -91,7 +91,7 @@ def get_roi(img,
             [img.shape[1]-polygon_down, img.shape[0]-1],
             [polygon_down, img.shape[0]-1]], dtype="float32")
 
-    img_mod = four_point_transform(tri_img, rect, vert_size)
+    img_mod, vert_size = four_point_transform(tri_img, rect, vert_size)
 
     return img_mod, vert_size
 
@@ -151,9 +151,9 @@ def get_line(img, vert_width):
     thresh_green = thresh(green, 3, 110)
     thresh_red = thresh(red, 3, 110)
 
-    cv2.imshow("ow", gray)
-    cv2.imshow("gr", green)
-    cv2.imshow("rd", red)
+    # cv2.imshow("ow", gray)
+    # cv2.imshow("gr", green)
+    # cv2.imshow("rd", red)
 
     yellow_and_white = cv2.bitwise_and(thresh_green, thresh_red)
 
@@ -177,7 +177,7 @@ def get_line(img, vert_width):
 
 
 def line_follower(image):
-    img_mod, vert_split = get_roi(image, 0.5, 0.4, 0.1)
+    img_mod, vert_split = get_roi(image, 0.4, 0.35, 0.0)
 
     yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
     if isinstance(yel_point_dev, int):
