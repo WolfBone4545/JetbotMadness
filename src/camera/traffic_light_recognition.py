@@ -28,17 +28,18 @@ def detect_circles(thresh, green, red):
 
             green_c = green[circle[1] - circle[2] - 10: circle[1] + circle[2] + 10, circle[0] - circle[2] - 10: circle[0] + circle[2] + 10]
             red_c = red[circle[1] - circle[2] - 10: circle[1] + circle[2] + 10, circle[0] - circle[2] - 10: circle[0] + circle[2] + 10]
+
+            dev = np.subtract(green_c, red_c).sum()
+            print(dev)
+            if dev > 0:
+                print("red")
+            else:
+                print("green")
+
             circles_list.append(((circle[0], circle[1]), circle[2], "red"))
 
             cv2.imshow("test_green", green_c)
             cv2.imshow("test_red", red_c)
-
-            # cv2.waitKey(0)
-
-            # draw the outer circle
-            # cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 2)
-            # draw the center of the circle
-            # cv2.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
 
     return circles_list
 
