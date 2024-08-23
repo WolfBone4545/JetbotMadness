@@ -86,10 +86,10 @@ def get_roi(img,
     tri_img = img.copy()
 
     rect = np.array([
-            [polygon_up, vert_size],
-            [img.shape[0]-polygon_up, vert_size],
-            [img.shape[0]-polygon_down, img.shape[1]-1],
-            [polygon_down, img.shape[1]-1]], dtype="float32")
+            [polygon_up, img.shape[0]-vert_size],
+            [img.shape[1]-polygon_up, img.shape[0]-vert_size],
+            [img.shape[1]-polygon_down, img.shape[0]-1],
+            [polygon_down, img.shape[0]-1]], dtype="float32")
 
     img_mod = four_point_transform(tri_img, rect, vert_size)
 
@@ -177,7 +177,7 @@ def get_line(img, vert_width):
 
 
 def line_follower(image):
-    img_mod, vert_split = get_roi(image, 0.5, 0.4, 0.3)
+    img_mod, vert_split = get_roi(image, 0.5, 0.4, 0.1)
 
     yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
     if isinstance(yel_point_dev, int):
