@@ -80,7 +80,7 @@ def get_roi(img,
     vert_size = int(img.shape[0] * vert_cutting_factor)
 
     # cut image corners
-    polygon_up = int(img.shape[0] * corner_up_factor)
+    polygon_up = int(img.shape[1] * corner_up_factor)
     polygon_down = int(img.shape[1] * corner_down_factor)
 
     tri_img = img.copy()
@@ -151,9 +151,9 @@ def get_line(img, vert_width):
     thresh_green = thresh(green, 3, 110)
     thresh_red = thresh(red, 3, 110)
 
-    cv2.imshow("ow", only_white)
-    cv2.imshow("gr", thresh_green)
-    cv2.imshow("rd", thresh_red)
+    cv2.imshow("ow", gray)
+    cv2.imshow("gr", green)
+    cv2.imshow("rd", red)
 
     yellow_and_white = cv2.bitwise_and(thresh_green, thresh_red)
 
