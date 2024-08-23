@@ -11,7 +11,10 @@ def threshold(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     ret, thresh = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY)
-    thresh = thresh[:thresh.shape[0], :] = 0
+    
+    print(thresh)
+    cut = thresh.shape[0]
+    thresh[:cut, :] = 0
 
     return thresh
 
@@ -21,7 +24,7 @@ def detect_circles(thresh, green, red):
     circles_list = []
     if circles is not None:
         circles = np.uint16(np.around(circles))
-        for i in circles[0, :]:
+        for i in circles:
             green_c = green[i[1] - i[2] - 10: i[1] + i[2] + 10, i[0] - i[2] - 10: i[0] + i[2] + 10]
             red_c = red[i[1] - i[2] - 10: i[1] + i[2] + 10, i[0] - i[2] - 10: i[0] + i[2] + 10]
 
