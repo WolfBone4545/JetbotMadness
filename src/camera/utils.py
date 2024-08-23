@@ -1,13 +1,19 @@
 import numpy as np
 import cv2
 from jetbot import Camera
-
+import pathlib
 
 # Load camera coefficients
-K = np.load("./config/matrix.npy")
+
+config_path = pathlib.Path(__file__).parents[1]
+matrix_path = config_path.joinpath("config/matrix.npy")
+
+K = np.load(matrix_path)
+
+distortion_path = config_path.joinpath("config/matrix.npy")
 
 # Example distortion coefficients (D)
-D = np.load("./config/distortion.npy")
+D = np.load(distortion_path)
 IMG_SHAPE = (328, 246)
 RESOLUTION_MODE = 2
 ARUCO_MARKER_SIZE = 5.0
