@@ -152,8 +152,8 @@ def get_line(img, vert_width):
     thresh_red = thresh(red, 3, 110)
 
     cv2.imshow("ow", only_white)
-    cv2.imshow("gr", only_white)
-    cv2.imshow("rd", only_white)
+    cv2.imshow("gr", thresh_green)
+    cv2.imshow("rd", thresh_red)
 
     yellow_and_white = cv2.bitwise_and(thresh_green, thresh_red)
 
