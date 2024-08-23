@@ -12,26 +12,26 @@ def threshold(img):
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     ret, thresh = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY)
     
-    print(thresh)
-    cut = thresh.shape[0]
+    cut = int(thresh.shape[0] / 2)
     thresh[:cut, :] = 0
 
     return thresh
 
 
 def detect_circles(thresh, green, red):
-    circles = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 1, 20, param2=10, minRadius=0, maxRadius=30)
+    circles = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 1, 20, param2=10, minRadius=0, maxRadius=40)
     circles_list = []
     if circles is not None:
         circles = np.uint16(np.around(circles))
         for i in circles:
-            green_c = green[i[1] - i[2] - 10: i[1] + i[2] + 10, i[0] - i[2] - 10: i[0] + i[2] + 10]
-            red_c = red[i[1] - i[2] - 10: i[1] + i[2] + 10, i[0] - i[2] - 10: i[0] + i[2] + 10]
+            circle = i[0]
 
-            circles_list.append(((i[0], i[1]), i[2], "red"))
+            green_c = green[circle[1] - circle[2] - 10: circle[1] + circle[2] + 10, circle[0] - circle[2] - 10: circle[0] + circle[2] + 10]
+            red_c = red[circle[1] - circle[2] - 10: circle[1] + circle[2] + 10, circle[0] - circle[2] - 10: circle[0] + circle[2] + 10]
+            circles_list.append(((circle[0], circle[1]), circle[2], "red"))
 
-            # cv2.imshow("test_green", green_c)
-            # cv2.imshow("test_red", red_c)
+            cv2.imshow("test_green", green_c)
+            cv2.imshow("test_red", red_c)
 
             # cv2.waitKey(0)
 
@@ -49,11 +49,11 @@ def detect_traffic_light(img):
     thresh = threshold(img)
     circles = detect_circles(thresh, green, red)
     for circle in circles:
-        cv2.circle(cimg, circle[0], circles[1], (0, 255, 0), 2)
-        cv2.putText(cimg, 'OpenCV', (circle[0][0] - circles[1], circle[0][1] - circles[1]), cv2.FONT_HERSHEY_SIMPLEX, 
+        cv2.circle(cimg, circle[0], circle[1], (0, 255, 0), 2)
+        cv2.putText(cimg, circle[2], (circle[0][0] - circle[1], circle[0][1] - circle[1]), cv2.FONT_HERSHEY_SIMPLEX, 
                    1, (0, 255, 0), 2, cv2.LINE_AA)
 
-    cv2.imshow("thresh red", thresh)
+    cv2.imshow("thresh", thresh)
     cv2.imshow("copy img", cimg)
     cv2.waitKey(1)
 
