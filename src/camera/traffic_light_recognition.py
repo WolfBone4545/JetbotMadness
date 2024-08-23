@@ -4,7 +4,14 @@ import numpy as np
 
 
 def traffic_light_recognition(image):
-    detect_traffic_light(image)
+    traffic_lights = detect_traffic_light(image)
+    for circle in traffic_lights:
+        cv2.circle(image, circle[0], circle[1], (0, 255, 0), 2)
+        cv2.putText(image, circle[2], (circle[0][0] - circle[1], circle[0][1] - circle[1]), cv2.FONT_HERSHEY_SIMPLEX, 
+                   1, (0, 255, 0), 2, cv2.LINE_AA)
+
+    cv2.imshow("copy img", image)
+    cv2.waitKey(1)
 
 
 def threshold(img):
@@ -29,17 +36,15 @@ def detect_circles(thresh, green, red):
             green_c = green[circle[1] - circle[2] - 10: circle[1] + circle[2] + 10, circle[0] - circle[2] - 10: circle[0] + circle[2] + 10]
             red_c = red[circle[1] - circle[2] - 10: circle[1] + circle[2] + 10, circle[0] - circle[2] - 10: circle[0] + circle[2] + 10]
 
-            dev = np.subtract(green_c, red_c).sum()
-            print(dev)
-            if dev > 0:
-                print("red")
-            else:
-                print("green")
+            green_c = cv2.GaussianBlur(green_c, (21, 21), 0)
+            red_c = cv2.GaussianBlur(red_c, (21, 21), 0)
 
-            circles_list.append(((circle[0], circle[1]), circle[2], "red"))
+            dev = np.subtract(green_c, red_c).mean()
+            t_cls = ""
+            if dev > 130: t_cls = "red"
+            else: t_cls = "green"
 
-            cv2.imshow("test_green", green_c)
-            cv2.imshow("test_red", red_c)
+            circles_list.append(((circle[0], circle[1]), circle[2], t_cls))
 
     return circles_list
 
@@ -49,14 +54,8 @@ def detect_traffic_light(img):
     cimg = img.copy()
     thresh = threshold(img)
     circles = detect_circles(thresh, green, red)
-    for circle in circles:
-        cv2.circle(cimg, circle[0], circle[1], (0, 255, 0), 2)
-        cv2.putText(cimg, circle[2], (circle[0][0] - circle[1], circle[0][1] - circle[1]), cv2.FONT_HERSHEY_SIMPLEX, 
-                   1, (0, 255, 0), 2, cv2.LINE_AA)
 
-    cv2.imshow("thresh", thresh)
-    cv2.imshow("copy img", cimg)
-    cv2.waitKey(1)
+    return circles
 
 
 if __name__ == "__main__":
