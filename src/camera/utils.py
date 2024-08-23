@@ -10,7 +10,7 @@ matrix_path = config_path.joinpath("config/matrix.npy")
 
 K = np.load(matrix_path)
 
-distortion_path = config_path.joinpath("config/matrix.npy")
+distortion_path = config_path.joinpath("config/distortion.npy")
 
 # Example distortion coefficients (D)
 D = np.load(distortion_path)
