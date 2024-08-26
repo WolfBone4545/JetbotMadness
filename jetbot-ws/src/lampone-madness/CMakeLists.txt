@@ -197,6 +197,8 @@ include_directories(
 ## Testing ##
 #############
 
+roslaunch_add_file_check(launch)
+
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_lampone-madness.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
