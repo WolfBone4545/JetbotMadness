@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+    <include file="$(find lampone-madness)/launch/lampone.launch"/>
+    
+    <node name="lampone_main" pkg="lampone" type="main.py" output="screen"/>
+
+</launch>

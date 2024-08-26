@@ -157,7 +157,7 @@ def get_line(img, vert_width):
     # cv2.imshow("rd", red)
 
     yellow_and_white = cv2.bitwise_and(thresh_green, thresh_red)
-    cv2.imshow("yaw", only_white)
+    # cv2.imshow("yaw", only_white)
     # print(yellow_and_white.max())
 
     only_white = thresh_blue & thresh_green & thresh_red
@@ -178,21 +178,24 @@ def get_line(img, vert_width):
     return yellow_dev_points, white_dev_points
 
 
-def line_follower(image):
+def line_follower(image, debug=False):
     img_mod, vert_split = get_roi(image, 0.3, 0.15, 0.0)
 
     yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
     if isinstance(yel_point_dev, int):
         return
+    
+    if debug:
+        for dev in yel_point_dev:
+            cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
 
-    for dev in yel_point_dev:
-        cv2.circle(image, (dev[0], dev[1]), 5, (255, 0, 0), -1)
+        for dev in white_point_dev:
+            cv2.circle(image, (dev[0], dev[1]), 5, (0, 0, 255), -1)
 
-    for dev in white_point_dev:
-        cv2.circle(image, (dev[0], dev[1]), 5, (0, 0, 255), -1)
-
-    cv2.imshow("test", image)
-    cv2.waitKey(1)
+        cv2.imshow("test", image)
+        cv2.waitKey(1)
+    
+    return yel_point_dev, white_point_dev
 
 
 ### EXAMPLE USAGE ###
