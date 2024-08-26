@@ -7,4 +7,8 @@
 !/src_neural/source/README.roboflow.txt
 
 # python generated files
-/src/camera/__pycache__
+__pycache__/
+
+/jetbot-ws/*
+!/jetbot-ws/src/
+!/jetbot-ws/README.md
