@@ -51,12 +51,12 @@ def detect_circles(thresh, green, red):
 
 def detect_traffic_light(img):
     blue, green, red = cv2.split(img)
-    cimg = img.copy()
     thresh = threshold(img)
     circles = detect_circles(thresh, green, red)
 
     return circles
 
 
+### EXAMPLE USAGE ###
 if __name__ == "__main__":
     utils.run_camera_with_callback(traffic_light_recognition)
