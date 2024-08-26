@@ -18,6 +18,13 @@ IMG_SHAPE = (328, 246)
 RESOLUTION_MODE = 2
 ARUCO_MARKER_SIZE = 5.0
 
+# Server settings
+URL_server = "http://192.168.100.22/image/image.png"
+K_server = np.array([[800.0, 0.0, 960.0],
+                     [0.0, 600.0, 540.0],
+                     [0.0, 0.0, 1.0]])
+D_server = np.array([0.03, -0.05, 0.002, 0.002])
+
 
 def camera_calib(img):
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, (img.shape[1], img.shape[0]), cv2.CV_16SC2)
