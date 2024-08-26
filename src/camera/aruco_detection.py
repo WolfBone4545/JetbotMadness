@@ -53,5 +53,6 @@ def aruco_detection(image):
     cv2.waitKey(1)
 
 
+### EXAMPLE USAGE ###
 if __name__ == "__main__":
     utils.run_camera_with_callback(aruco_detection)

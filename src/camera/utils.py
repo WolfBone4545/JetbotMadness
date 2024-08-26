@@ -20,10 +20,6 @@ ARUCO_MARKER_SIZE = 5.0
 
 # Server settings
 URL_server = "http://192.168.100.22/image/image.png"
-K_server = np.array([[800.0, 0.0, 960.0],
-                     [0.0, 600.0, 540.0],
-                     [0.0, 0.0, 1.0]])
-D_server = np.array([0.03, -0.05, 0.002, 0.002])
 
 
 def camera_calib(img):
@@ -40,3 +36,12 @@ def run_camera_with_callback(callback):
     camera = Camera.instance(width=int(IMG_SHAPE[0] * RESOLUTION_MODE), height=int(IMG_SHAPE[1] * RESOLUTION_MODE), fps = 10)
     update({"new": camera.value})
     camera.observe(update, names="value")
+
+
+### EXAMPLE USAGE ###
+if __name__ == "__main__":
+    def callback(image):
+        cv2.imshow("test", image)
+        cv2.waitKey(1)
+
+    run_camera_with_callback(callback)
