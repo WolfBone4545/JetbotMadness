@@ -3,7 +3,7 @@
     <node name="camera_node" pkg="lampone-madness" type="camera_node.py"  output="log" respawn="false" respawn_delay="0">
 
     </node>
-    <node name="camera_sub" pkg="lampone-madness" type="follower_wrapper.py"  output="log" respawn="false" respawn_delay="0">
+    <node name="line_follower" pkg="lampone-madness" type="follower_wrapper.py"  output="log" respawn="false" respawn_delay="0">
 
     </node>
 
