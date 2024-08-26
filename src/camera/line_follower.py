@@ -90,15 +90,14 @@ def get_roi(img,
             [img.shape[1]-polygon_up, img.shape[0]-vert_size],
             [img.shape[1]-polygon_down, img.shape[0]-1],
             [polygon_down, img.shape[0]-1]], dtype="float32")
-
+    
     img_mod, vert_size = four_point_transform(tri_img, rect, vert_size)
 
-    return img_mod, vert_size
+    return img_mod, img.shape[0] - vert_size
 
-
-def thresh(img, iters, threshold):
+def thresh(img, iters, threshold_min):
     blur = cv2.GaussianBlur(img, (5, 5), 0)
-    ret, thresh = cv2.threshold(blur, threshold, 255, cv2.THRESH_OTSU)
+    ret, thresh = cv2.threshold(blur, threshold_min, 255, cv2.THRESH_OTSU)
 
     mask = cv2.erode(thresh, None, iterations=iters)
     mask = cv2.dilate(mask, None, iterations=iters)
@@ -145,28 +144,31 @@ def get_line(img, vert_width):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     green = img[:, :, 1]
     red = img[:, :, 2]
+    blue = img[:, :, 0]
 
-    only_white = thresh(gray, 2, 160)
+    only_white = thresh(gray, 2, 0)
 
-    thresh_green = thresh(green, 3, 110)
-    thresh_red = thresh(red, 3, 110)
+    thresh_green = thresh(green, 3, 120)
+    thresh_red = thresh(red, 3, 120)
+    thresh_blue = thresh(blue, 3, 120)
 
     # cv2.imshow("ow", gray)
     # cv2.imshow("gr", green)
     # cv2.imshow("rd", red)
 
     yellow_and_white = cv2.bitwise_and(thresh_green, thresh_red)
+    cv2.imshow("yaw", only_white)
+    # print(yellow_and_white.max())
 
-    only_yellow = cv2.bitwise_and(cv2.bitwise_not(only_white), yellow_and_white)
+    only_white = thresh_blue & thresh_green & thresh_red
+    only_yellow = cv2.bitwise_not(thresh_blue) & thresh_green & thresh_red
+    # only_yellow = cv2.bitwise_and(cv2.bitwise_not(only_white), yellow_and_white)
     only_yellow = cv2.erode(only_yellow, None, iterations=3)
 
     only_white = get_right_white_line(only_white)
 
     if isinstance(only_white, int):
         return -1, -1
-
-    cv2.imshow("xd", only_white)
-    cv2.waitKey(1)
 
     # split mask into different patches
 
@@ -177,7 +179,7 @@ def get_line(img, vert_width):
 
 
 def line_follower(image):
-    img_mod, vert_split = get_roi(image, 0.4, 0.35, 0.0)
+    img_mod, vert_split = get_roi(image, 0.3, 0.2, 0.0)
 
     yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
     if isinstance(yel_point_dev, int):
