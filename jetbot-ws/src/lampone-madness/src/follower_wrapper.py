@@ -13,8 +13,8 @@ class FollowerWrapper:
 
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
-        self.subscriber = rospy.Subscriber("/camera", Image, callback=self.image_callback, queue_size=1)
-        self.publisher = rospy.Publisher('line_data', String, queue_size=10)
+        self.subscriber = rospy.Subscriber("camera", Image, callback=self.image_callback, queue_size=1)
+        self.publisher = rospy.Publisher("line_data", String, queue_size=10)
 
     def image_callback(self, msg):
         image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
