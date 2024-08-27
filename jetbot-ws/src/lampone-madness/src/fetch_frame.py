@@ -14,7 +14,7 @@ class FrameFetcher:
     def __init__(self):
         self.rate = rospy.Rate(1)
         self.cv_bridge = cv_bridge.CvBridge()
-        self.image_pub = rospy.Publisher("/frame", Image, queue_size=10)
+        self.image_pub = rospy.Publisher("/frame", Image, queue_size=1)
 
         # Server settings
         self.URL_server = "http://192.168.100.22/image/image.png"

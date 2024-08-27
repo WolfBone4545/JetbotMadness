@@ -11,7 +11,7 @@ class CameraNode:
     def __init__(self):
         self.rate = rospy.Rate(10)
         self.cv_bridge = cv_bridge.CvBridge()
-        self.image_pub = rospy.Publisher("camera", Image, queue_size=10)
+        self.image_pub = rospy.Publisher("camera", Image, queue_size=1)
 
         def publish_camera(image):
             if rospy.is_shutdown():
