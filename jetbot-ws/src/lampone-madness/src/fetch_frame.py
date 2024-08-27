@@ -40,7 +40,8 @@ class FrameFetcher:
 
                     publish_frame(img)
                 except Exception as e:
-                    rospy.logerr(f"Fuck U: " + str(e))
+                    pass
+                    # rospy.loginfo(f"Error: " + str(e))
 
             self.rate.sleep()
 
