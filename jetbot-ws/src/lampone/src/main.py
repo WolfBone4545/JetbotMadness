@@ -19,8 +19,7 @@ class Main:
 
     def line_callback(self, data):
         points = eval(data.data)
-        
-        rospy.loginfo(data.data)
+        # rospy.loginfo(data.data)
         tmp_img = self.muj_image.copy()
 
         if points is None:
