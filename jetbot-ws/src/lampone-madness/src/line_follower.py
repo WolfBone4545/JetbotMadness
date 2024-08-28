@@ -152,12 +152,12 @@ def get_line(img, vert_width):
     white = thresh(hsv, 3, (0,255), (0,70), (140,255))
     yellow = thresh(hsv, 3, (20,40), (40,255), (90,255))
 
-    print(hsv[100, 10])
-    cv2.circle(hsv, (10, 100), 5, (255, 255, 255), -1)
-    cv2.imshow("hsv", hsv)
-    cv2.imshow("yw", yellow)
-    cv2.imshow("wt", white)
-    cv2.waitKey(1)
+    # print(hsv[100, 10])
+    # cv2.circle(hsv, (10, 100), 5, (255, 255, 255), -1)
+    # cv2.imshow("hsv", hsv)
+    # cv2.imshow("yw", yellow)
+    # cv2.imshow("wt", white)
+    # cv2.waitKey(1)
 
     white = get_right_white_line(white)
 
