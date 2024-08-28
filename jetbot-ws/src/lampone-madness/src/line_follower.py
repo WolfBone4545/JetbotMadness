@@ -95,14 +95,21 @@ def get_roi(img,
 
     return img_mod, img.shape[0] - vert_size
 
-def thresh(img, iters, threshold_min):
-    blur = cv2.GaussianBlur(img, (5, 5), 0)
-    ret, thresh = cv2.threshold(blur, threshold_min, 255, cv2.THRESH_OTSU)
+def thresh(hsv, iters, h_vals, s_vals, v_vals):
+    blur = cv2.GaussianBlur(hsv, (5, 5), 0)
+    h,s,v = cv2.split(blur)
 
-    mask = cv2.erode(thresh, None, iterations=iters)
-    mask = cv2.dilate(mask, None, iterations=iters)
+    mask0 = cv2.inRange(h, *h_vals)
+    mask1 = cv2.inRange(s, *s_vals)
+    mask2 = cv2.inRange(v, *v_vals)
+    mask = cv2.bitwise_and(mask0, mask1, mask = None)
+    mask = cv2.bitwise_and(mask, mask2, mask = None)
 
-    return mask
+    ret = cv2.erode(mask, None, iterations=iters)
+    ret = cv2.dilate(ret, None, iterations=iters*2)
+    ret = cv2.erode(ret, None, iterations=iters)
+
+    return ret
 
 
 def parse_patches(img, vert_width):
@@ -141,39 +148,26 @@ def get_right_white_line(white_mask):
 
 
 def get_line(img, vert_width):
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    green = img[:, :, 1]
-    red = img[:, :, 2]
-    blue = img[:, :, 0]
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    white = thresh(hsv, 3, (0,255), (0,70), (140,255))
+    yellow = thresh(hsv, 3, (20,40), (40,255), (90,255))
 
-    only_white = thresh(gray, 2, 0)
+    print(hsv[100, 10])
+    cv2.circle(hsv, (10, 100), 5, (255, 255, 255), -1)
+    cv2.imshow("hsv", hsv)
+    cv2.imshow("yw", yellow)
+    cv2.imshow("wt", white)
+    cv2.waitKey(1)
 
-    thresh_green = thresh(green, 3, 100)
-    thresh_red = thresh(red, 3, 100)
-    thresh_blue = thresh(blue, 3, 100)
+    white = get_right_white_line(white)
 
-    # cv2.imshow("ow", gray)
-    # cv2.imshow("gr", green)
-    # cv2.imshow("rd", red)
-
-    yellow_and_white = cv2.bitwise_and(thresh_green, thresh_red)
-    # cv2.imshow("yaw", only_white)
-    # print(yellow_and_white.max())
-
-    only_white = thresh_blue & thresh_green & thresh_red
-    only_yellow = cv2.bitwise_not(thresh_blue) & thresh_green & thresh_red
-    # only_yellow = cv2.bitwise_and(cv2.bitwise_not(only_white), yellow_and_white)
-    only_yellow = cv2.erode(only_yellow, None, iterations=3)
-
-    only_white = get_right_white_line(only_white)
-
-    if isinstance(only_white, int):
+    if isinstance(white, int):
         return -1, -1
 
     # split mask into different patches
 
-    yellow_dev_points = parse_patches(only_yellow, vert_width)
-    white_dev_points = parse_patches(only_white, vert_width)
+    yellow_dev_points = parse_patches(yellow, vert_width)
+    white_dev_points = parse_patches(white, vert_width)
 
     return yellow_dev_points, white_dev_points
 
