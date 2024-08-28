@@ -173,7 +173,7 @@ def get_line(img, vert_width):
 
 
 def line_follower(image, debug=False):
-    img_mod, vert_split = get_roi(image, 0.3, 0.15, 0.0)
+    img_mod, vert_split = get_roi(image, 0.3, 0.0, 0.0)
 
     yel_point_dev, white_point_dev = get_line(img_mod, vert_split)
     if isinstance(yel_point_dev, int):
