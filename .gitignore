@@ -12,3 +12,5 @@ __pycache__/
 /jetbot-ws/*
 !/jetbot-ws/src/
 !/jetbot-ws/README.md
+
+.vscode
